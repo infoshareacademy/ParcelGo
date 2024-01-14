@@ -1,6 +1,6 @@
 # Import Logo from ascii.py
 from ascii import logo
-
+from functionality_sending_a_parcel import get_package_dimensions
 
 def main_menu():
 # pętla głównego menu
@@ -13,7 +13,7 @@ def main_menu():
             pass
     #TODO wywołać funkcjonalność opcji nadania paczki
         elif chosen_option == "2":
-            pass
+            get_package_dimensions()
     # TODO wywołać funkcjonalność opcji odbioru paczki
         elif chosen_option == "3":
             pass
