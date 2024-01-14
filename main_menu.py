@@ -10,10 +10,10 @@ def main_menu():
         chosen_option = input("proszę o wskazanie numeru opcji: ")
 
         if chosen_option == "1":
-            pass
-    #TODO wywołać funkcjonalność opcji nadania paczki
-        elif chosen_option == "2":
             get_package_dimensions()
+
+        elif chosen_option == "2":
+            pass
     # TODO wywołać funkcjonalność opcji odbioru paczki
         elif chosen_option == "3":
             pass
