@@ -1,6 +1,7 @@
 # Import Logo from ascii.py
+
 from ascii import logo
-from functionality_sending_a_parcel import get_package_dimensions
+from functionality_sending_a_parcel import dm_ver_loop
 
 
 def main_menu():
@@ -13,7 +14,7 @@ def main_menu():
         chosen_option = input("proszę o wskazanie numeru opcji: ")
 
         if chosen_option == "1":
-            get_package_dimensions()
+            dm_ver_loop(chosen_option)
 
         elif chosen_option == "2":
             pass
