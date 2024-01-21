@@ -12,7 +12,7 @@ def wybierz_metode_dostarczenia():
         deliv_number = input("Podaj numer budynku: ")
     elif wybor == "2":
         numer_paczkomatu = input("Podaj numer paczkomatu: ")
-        return f"Dostawa do wybranego paczkomatu. Numer paczkomatu: {numer_paczkomatu}"
+        print(f"Dostawa do wybranego paczkomatu. Numer paczkomatu: {numer_paczkomatu}")
     else:
         print("\nNieprawidłowy wybór metody dostarczenia\nProszę o wybranie opcji ze wskazanej listy.")
         wybierz_metode_dostarczenia()
