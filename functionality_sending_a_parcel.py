@@ -17,27 +17,29 @@ def get_package_dimensions():
 
 
 def dimensions_validation(wt, dpt, ht, wd):
+    is_package_ok = True
     if wt > 20:
         print(f"\n Przekoroczono makymalną wagę paczki o {round((wt - 20), 2)}kg\n")
-        return True
+        is_package_ok = False
     if wd > 40:
         print(
             f"\n Przekoroczono makymalny rozmiar szerokości paczki o {round((wd - 40), 2)}cm\n"
         )
-        return True
+        is_package_ok = False
     if ht > 40:
         print(
             f"\n Przekoroczono makymalny rozmiar wysokości paczki o {round((ht - 40), 2)}cm\n"
         )
-        return True
+        is_package_ok = False
     if dpt > 60:
         print(
             f"\n Przekoroczono makymalny rozmiar głebokości paczki o {round((dpt - 60), 2)}cm\n"
         )
-        return True
+        is_package_ok = False
+    return is_package_ok
 
 
 def dm_ver_loop(chosen_option):
     dm_list = get_package_dimensions()
-    if dimensions_validation(dm_list[0], dm_list[1], dm_list[2], dm_list[3]):
+    if not dimensions_validation(dm_list[0], dm_list[1], dm_list[2], dm_list[3]):
         dm_ver_loop(chosen_option)
