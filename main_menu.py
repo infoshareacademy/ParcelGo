@@ -16,7 +16,7 @@ def main_menu():
 
         if chosen_option == "1":
             dm_ver_loop(chosen_option)
-            wybierz_metode_dostarczenia()
+            data_for_send = wybierz_metode_dostarczenia()
 
         elif chosen_option == "2":
             pass
