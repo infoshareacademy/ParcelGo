@@ -1,0 +1,42 @@
+{
+  "1": {
+
+      "miasto": "Szczecin",
+      "ulica": "Przyjaciół żołnierza",
+      "numer": "55/U1",
+      "paczki": []
+    },
+  "2":
+    {
+
+      "miasto": "Gdańsk",
+      "ulica": "11 Listopada",
+      "numer": "6",
+      "paczki": []
+    },
+  "3":
+    {
+
+      "miasto": "Gdańsk",
+      "ulica": "Słowackiego",
+      "numer": "35",
+      "paczki": []
+    },
+  "4":
+    {
+
+      "miasto": "Kraków",
+      "ulica": "Bieżanowska",
+      "numer": "276",
+      "paczki": []
+    },
+  "5":
+    {
+
+      "miasto": "Warszawa",
+      "ulica": "Smocza",
+      "numer": "21",
+      "paczki": []
+    }
+
+}
