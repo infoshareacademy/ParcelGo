@@ -13,7 +13,7 @@ def wybierz_metode_dostarczenia():
         deliv_town = input("Proszę podać miasto docelowe :")
         deliv_street = input("Podaj ulicę: ")
         deliv_number = input("Podaj numer budynku: ")
-        return {"reciver":package_reciver, "town":deliv_town, "street":deliv_street, "number": deliv_number}
+        return {"reciver": package_reciver, "town": deliv_town, "street": deliv_street, "number": deliv_number}
 
     elif wybor == "2":
         chosen_locker = get_locker_id()
@@ -57,7 +57,7 @@ def get_locker_id():
                 f" ul.{chosen_machine["ulica"]} {chosen_machine["numer"]}"
             )
 
-            return {given_machine_id:chosen_machine}
+            return {given_machine_id: chosen_machine}
 
         print("\nWskazany numer urządzenia nie istnieje")
         get_locker_id()
