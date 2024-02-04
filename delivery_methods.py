@@ -16,44 +16,58 @@ def wybierz_metode_dostarczenia():
         return {"reciver":package_reciver, "town":deliv_town, "street":deliv_street, "number": deliv_number}
 
     elif wybor == "2":
-        chosen_locker = send_to_locker()
+        chosen_locker = get_locker_id()
         return chosen_locker
     else:
         print("\nNieprawidłowy wybór metody dostarczenia\nProszę o wybranie opcji ze wskazanej listy.")
         wybierz_metode_dostarczenia()
 
 
-def selecting_locker_ver_loop():
-    print("\nWybór opcji\n1 - Wybór urządzenia\n2 - Podaj listę urządzeń")
+def get_locker_option():
+    print("\nWybór opcji\n"
+          "1 - Wybór urządzenia\n"
+          "2 - Podaj listę urządzeń"
+          )
     chose_locker_option = input("proszę o wskazanie numeru opcji: ")
+
     if chose_locker_option != "1" and chose_locker_option != "2":
         print("\nBłędny wybór\nProszę o wybranie numeru opcji ze wskazanej listy\n")
-        send_to_locker()
+        return get_locker_option()
+
     else:
         return chose_locker_option
 
 
-def send_to_locker():
+def get_locker_id():
     with open('machines_list.json', 'r') as f:
         machines_dict = json.load(f)
 
-    chose_paczkomat_option = selecting_locker_ver_loop()
+    chose_paczkomat_option = get_locker_option()
 
     if chose_paczkomat_option == "1":
 
         given_machine_id = input("\nwprowadź numer urządzenia :")
         chosen_machine = machines_dict.get(given_machine_id)
+
         if chosen_machine:
             print(
-                f"\nWybrany Paczkomat:\nNumer urządzenia - {given_machine_id}\nAdres: {chosen_machine["miasto"]}, ul.{chosen_machine["ulica"]} {chosen_machine["numer"]}")
+                f"\nWybrany Paczkomat:\n"
+                f"Numer urządzenia - {given_machine_id}\n"
+                f"Adres: {chosen_machine["miasto"]},"
+                f" ul.{chosen_machine["ulica"]} {chosen_machine["numer"]}"
+            )
+
             return {given_machine_id:chosen_machine}
-        else:
-            print("\nWskazany numer urządzenia nie istnieje")
-            send_to_locker()
+
+        print("\nWskazany numer urządzenia nie istnieje")
+        get_locker_id()
 
     elif chose_paczkomat_option == "2":
         for machine in machines_dict:
             print(
-                f"\nNumer urządzenia - {machine}\n Adres: {machines_dict.get(machine)["miasto"]}, "
-                f"ul.{machines_dict.get(machine)["ulica"]} {machines_dict.get(machine)["numer"]}")
-        send_to_locker()
+                f"\nNumer urządzenia - {machine}\n"
+                f" Adres: {machines_dict.get(machine)["miasto"]}, "
+                f"ul.{machines_dict.get(machine)["ulica"]} {machines_dict.get(machine)["numer"]}"
+            )
+
+        get_locker_id()
