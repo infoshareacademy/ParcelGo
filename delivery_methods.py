@@ -57,7 +57,7 @@ def get_locker_id():
                 f" ul.{chosen_machine["ulica"]} {chosen_machine["numer"]}"
             )
 
-            chosen_machine["paczkomat ID"] = given_machine_id
+            chosen_machine["machine_id"] = given_machine_id
             return chosen_machine
 
         print("\nWskazany numer urządzenia nie istnieje")

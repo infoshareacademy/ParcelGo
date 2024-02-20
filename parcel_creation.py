@@ -1,7 +1,7 @@
 import random
 import json
 
-PACKAGE_VOLUME_RANGE = 100
+PACKAGE_VOLUME_RANGE = 5
 
 
 def generating_parcel_number():
@@ -9,11 +9,11 @@ def generating_parcel_number():
         parcel_dict = json.load(f)
 
     parcel_number = str(
-        random.choice(list(set([x for x in range(1, PACKAGE_VOLUME_RANGE)])))
+        random.randint(0, PACKAGE_VOLUME_RANGE)
     )
     while parcel_number in parcel_dict.keys():
         parcel_number = str(
-            random.choice(list(set([x for x in range(1, PACKAGE_VOLUME_RANGE)])))
+            random.randint(0, PACKAGE_VOLUME_RANGE)
         )
 
     return parcel_number
