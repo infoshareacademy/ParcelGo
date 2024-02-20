@@ -57,7 +57,8 @@ def get_locker_id():
                 f" ul.{chosen_machine["ulica"]} {chosen_machine["numer"]}"
             )
 
-            return {given_machine_id: chosen_machine}
+            chosen_machine["machine_id"] = given_machine_id
+            return chosen_machine
 
         print("\nWskazany numer urządzenia nie istnieje")
         get_locker_id()
