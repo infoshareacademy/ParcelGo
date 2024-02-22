@@ -42,4 +42,4 @@ def dimensions_validation(wt, dpt, ht, wd):
 def dm_ver_loop(chosen_option):
     dm_list = get_package_dimensions()
     if not dimensions_validation(dm_list[0], dm_list[1], dm_list[2], dm_list[3]):
-        dm_ver_loop(chosen_option)
+        return dm_ver_loop(chosen_option)
