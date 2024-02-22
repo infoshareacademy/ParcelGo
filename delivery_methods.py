@@ -61,7 +61,7 @@ def get_locker_id():
             return chosen_machine
 
         print("\nWskazany numer urządzenia nie istnieje")
-        get_locker_id()
+        return get_locker_id()
 
     elif chose_paczkomat_option == "2":
         for machine in machines_dict:
@@ -71,4 +71,4 @@ def get_locker_id():
                 f"ul.{machines_dict.get(machine)["ulica"]} {machines_dict.get(machine)["numer"]}"
             )
 
-        get_locker_id()
+        return get_locker_id()

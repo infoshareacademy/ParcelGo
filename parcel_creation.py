@@ -1,7 +1,7 @@
 import random
 import json
 
-PACKAGE_VOLUME_RANGE = 5
+PACKAGE_VOLUME_RANGE = 100
 
 
 def generating_parcel_number():

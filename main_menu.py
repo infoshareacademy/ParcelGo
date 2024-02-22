@@ -4,6 +4,7 @@ from ascii import logo
 from functionality_sending_a_parcel import dm_ver_loop
 from delivery_methods import wybierz_metode_dostarczenia
 from parcel_creation import generating_parcel
+from functionality_package_pickup import package_pickup
 
 def main_menu():
     # pętla głównego menu
@@ -20,8 +21,8 @@ def main_menu():
             print(f"\nPaczka została nadana\nTwój numer paczki: {generating_parcel(data_for_send)}")
 
         elif chosen_option == "2":
-            pass
-        # TODO wywołać funkcjonalność opcji odbioru paczki
+            package_pickup()
+
         elif chosen_option == "3":
             pass
         # TODO wywołać funkcjonalność opcji śledzenia paczki
