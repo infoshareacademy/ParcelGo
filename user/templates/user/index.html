@@ -1,8 +1,8 @@
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentication</title>
+    <title>ParcelGo</title>
 </head>
 <body>
     {% for message in messages %}
@@ -14,19 +14,11 @@
     </div>
     {% endfor %}
     <h2>Welcome to ParcelGo</h2>
-    <p>Please sign in or sign up if you don't have account</p>
-
-    {% if user.is_authenticated %}
-    <h3>Hello {{ fname }}</h3>
-    <h4>You're successfully logged in</h4>
-    <button type="submit"><a href="/signout">SignOut</a></button>
+    <p>Please sign in or register if you don't have an account</p>
 
 
-    {% else %}
-    <button type="submit"><a href="/signin">SignIn</a></button>
-    <button type="submit"><a href="/signup">SignUp</a></button>
-    {% endif %}
-
+    <button type="submit"><a href="{% url 'login' %}">Sign In</a></button>
+    <button type="submit"><a href="{% url 'register' %}">Register</a></button>
 
 </body>
 </html>
