@@ -12,7 +12,7 @@ from django.views import View
 class SignUpView(CreateView):
     form_class = SignUpForm
     template_name = 'user/register.html'  # Własny szablon HTML dla rejestracji
-    success_url = '/login/'  # Po udanej rejestracji przekieruj na stronę logowania
+    success_url = '/users/login/'  # Po udanej rejestracji przekieruj na stronę logowania
 
 
 class CustomLoginView(LoginView):
@@ -25,16 +25,17 @@ class CustomLoginView(LoginView):
 
 class CustomLogoutView(LogoutView):
     def get_next_page(self):
-        # Przekieruj użytkownika na stronę główną po wylogowaniu
-        return reverse_lazy('index')
+        # Przekieruj użytkownika na stronę logowania po wylogowaniu
+        return reverse_lazy('login_or_register')
 
 
-class HomeView(View):
+class LoginOrRegisterView(View):
+
     def get(self, request):
         if request.user.is_authenticated:
             fname = request.user.first_name
             return render(request, 'user/account.html', {'fname': fname})
-        return render(request, 'user/index.html')
+        return render(request, 'user/login_or_register.html')
 
 
 class UserAccountView(LoginRequiredMixin, TemplateView):
