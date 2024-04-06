@@ -1,0 +1,17 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Account</title>
+</head>
+<body>
+    <h2>User Account</h2>
+    <p>Welcome, {{ fname }} {{ lname }}!</p>
+    <!-- Dodaj więcej treści dotyczących konta użytkownika -->
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Sign Out</button>
+    </form>
+
+</body>
+</html>
