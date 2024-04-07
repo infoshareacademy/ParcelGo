@@ -3,6 +3,7 @@ from .models import ParcelLocker
 from .forms import ParcelLockerSearchForm
 from django.db.models import Q
 
+
 def parcel_locker_search(request):
     parcel_lockers = None
     no_results_message = None
@@ -18,7 +19,7 @@ def parcel_locker_search(request):
                 )
 
                 if not parcel_lockers.exists():
-                    no_results_message = "Brak wyników dla zapytania: '{}'".format(search_query)
+                    no_results_message = f"Brak wyników dla zapytania: '{search_query}'"
     else:
         form = ParcelLockerSearchForm()
 
