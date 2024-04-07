@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approve Delivery</title>
+    <style>
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <h2>Approve Delivery</h2>
+
+    {% for message in messages %}
+        <div>{{ message }}</div>
+    {% endfor %}
+
+    <form method="post">
+        {% csrf_token %}
+        {% for parcel in pending_parcels %}
+            <input type="checkbox" name="approved_parcels" value="{{ parcel.id }}">
+            <label>{{ parcel }} - Parcel Locker: {{ parcel.destination_parcel_locker }}</label><br>
+        {% endfor %}
+        <button type="submit">Approve Selected Parcels</button>
+    </form>
+
+
+    <div class="button-container">
+        <button onclick="goBack()">Back</button>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    </div>
+</body>
+</html>

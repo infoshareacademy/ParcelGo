@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nowa Paczka</title>
+</head>
+<body>
+    <h2>Nowa Paczka</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Nadaj Paczkę</button>
+    </form>
+
+
+    <form action="{% url 'parcel_locker_search' %}" method="get">
+        <button type="submit">Znajdź Paczkomat</button>
+    </form>
+</body>
+</html>
