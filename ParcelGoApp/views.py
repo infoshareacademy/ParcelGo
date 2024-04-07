@@ -1,18 +1,31 @@
 from django.shortcuts import render
 from .models import ParcelLocker
 from .forms import ParcelLockerSearchForm
-
+from django.db.models import Q
 
 def parcel_locker_search(request):
-    parcel_lockers = None  # Początkowo ustawiamy na None, aby nie wyświetlać listy na początku
-    form = ParcelLockerSearchForm(request.GET or None)  # Pobierz dane z formularza lub utwórz nowy formularz
+    parcel_lockers = None
+    no_results_message = None
 
-    if form.is_valid():
-        search_query = form.cleaned_data.get('search_query')
-        if search_query:
-            # wyszukiwanie paczkomatów po mieście lub numerze paczkomatu
-            parcel_lockers = ParcelLocker.objects.filter(
-                city__icontains=search_query) | ParcelLocker.objects.filter(locker_number__icontains=search_query)
+    if request.method == 'GET':
+        form = ParcelLockerSearchForm(request.GET)
+        if form.is_valid():
+            search_query = form.cleaned_data.get('search_query')
+            if search_query:
+                # Wyszukaj paczkomaty po mieście lub numerze urządzenia
+                parcel_lockers = ParcelLocker.objects.filter(
+                    Q(city__icontains=search_query) | Q(locker_number__icontains=search_query)
+                )
 
-    return render(request, 'ParcelGoApp/parcel_locker_search.html', {'form': form, 'parcel_lockers': parcel_lockers})
+                if not parcel_lockers.exists():
+                    no_results_message = "Brak wyników dla zapytania: '{}'".format(search_query)
+    else:
+        form = ParcelLockerSearchForm()
+
+    return render(request, 'ParcelGoApp/parcel_locker_search.html', {
+        'form': form,
+        'parcel_lockers': parcel_lockers,
+        'no_results_message': no_results_message
+    })
+
 

@@ -1,8 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parcel Locker Search</title>
+    <title>Wyszukiwanie Paczkomatu</title>
     <style>
         table {
             border-collapse: collapse;
@@ -19,34 +20,45 @@
     </style>
 </head>
 <body>
-    <h1>Parcel Locker Search</h1>
+    <h1>Wyszukiwanie Paczkomatu</h1>
     <form method="get">
         {{ form.as_p }}
         <button type="submit">Search</button>
     </form>
 
-    {% if parcel_lockers %}
-    <h2>Parcel Locker List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Numer urządzenia</th>
-                <th>Adres</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for parcel_locker in parcel_lockers %}
-            <tr>
-                <td>{{ parcel_locker.locker_number }}</td>
-                <td>{{ parcel_locker.city }} - {{ parcel_locker.street }} {{ parcel_locker.street_number }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="2">Brak wyników</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if no_results_message %}
+        <p>{{ no_results_message }}</p>
     {% endif %}
+
+    {% if parcel_lockers %}
+        <h2>Lista urządzeń o wskazanym parametrze</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Numer urządzenia</th>
+                    <th>Adres</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for parcel_locker in parcel_lockers %}
+                    <tr>
+                        <td>{{ parcel_locker.locker_number }}</td>
+                        <td>{{ parcel_locker.city }} - {{ parcel_locker.street }} {{ parcel_locker.street_number }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">Brak wyników</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <button onclick="goBack()">Back</button>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>
