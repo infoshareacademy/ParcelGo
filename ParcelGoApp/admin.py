@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Parcel, ParcelLocker
 
-# Register your models here.
+admin.site.register(Parcel)
+admin.site.register(ParcelLocker)

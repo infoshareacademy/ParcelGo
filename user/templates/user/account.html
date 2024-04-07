@@ -6,8 +6,23 @@
 </head>
 <body>
     <h2>User Account</h2>
-    <p>Welcome, {{ fname }} {{ lname }}!</p>
+    <p>Welcome, {{ fname }}</p>
     <!-- Dodaj więcej treści dotyczących konta użytkownika -->
+    <form action="{% url 'create_parcel' %}" method="get">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="display:inline-block; padding: 5px 10px;">Send Parcel</button>
+    </form>
+    
+    {% if user.is_staff %}
+    <form action="{% url 'approve_delivery' %}" method="get">
+        <button type="submit" class="btn btn-primary" style="display:inline-block; padding: 5px 10px;">Approve Delivery</button>
+    </form>
+    {% endif %}
+    
+    <form action="{% url 'parcel_locker_search' %}" method="get">
+        <button type="submit" class="btn btn-primary" style="display:inline-block; padding: 5px 10px;">Search for Parcel Locker</button>
+    </form>
+    
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
         <button type="submit">Sign Out</button>
