@@ -4,7 +4,8 @@ from django.shortcuts import render, redirect
 from .models import ParcelLocker, Parcel
 from .forms import ParcelLockerSearchForm, ParcelForm
 from django.db.models import Q
-
+import random
+from django.views.generic import TemplateView
 
 def parcel_locker_search(request):
     parcel_lockers = None
@@ -71,14 +72,53 @@ def approve_delivery(request):
                 parcel_locker.capacity -= 1
                 parcel_locker.save()
 
-        Parcel.objects.filter(id__in=approved_parcel_ids).update(is_delivered=True)
-        Parcel.objects.filter(id__in=approved_parcel_ids).update(status='Delivered')
+            pickup_code = ''.join(str(random.randint(0, 9)) for _ in range(6))
+            parcel.pickup_code = pickup_code
+            parcel.save()
+
+        Parcel.objects.filter(id__in=approved_parcel_ids).update(is_delivered=True, status='Delivered')
 
         return redirect('delivery_approval_success')
 
     else:
-        pending_parcels = Parcel.objects.filter(is_approved=False).exclude(status='Delivered')
+        pending_parcels = Parcel.objects.filter(is_approved=False).exclude(status__in=['Delivered', 'Received'])
         return render(request, 'ParcelGoApp/approve_delivery.html', {'pending_parcels': pending_parcels})
+
 
 def delivery_approval_success(request):
     return render(request, 'ParcelGoApp/delivery_approval_success.html')
+
+
+def parcel_pickup(request):
+    if request.method == 'POST':
+        recipient_phone = request.POST.get('recipient_phone')
+        pickup_code = request.POST.get('pickup_code')
+
+        try:
+            parcel = Parcel.objects.get(recipient_phone=recipient_phone, pickup_code=pickup_code)
+
+            # Weryfikacja aktualnego statusu paczki
+            if parcel.status == 'Received':
+                # Wyświetlenie wiadomości z datą odbioru
+                success_message = f'Parcel has already been received on {parcel.received_date}.'
+                return render(request, 'ParcelGoApp/parcel_pickup.html', {'success_message': success_message})
+
+
+            # Wywołanie metody mark_as_received
+            parcel.mark_as_received()
+
+            # Zwiększenie pojemności paczkomatu
+            parcel_locker = parcel.destination_parcel_locker
+            parcel_locker.capacity += 1
+            parcel_locker.save()
+
+            messages.success(request, 'Parcel has been successfully picked up.')
+
+        except Parcel.DoesNotExist:
+            messages.error(request, 'Invalid recipient phone or pickup code.')
+
+    return render(request, 'ParcelGoApp/parcel_pickup.html')
+
+
+class HomePageView(TemplateView):
+    template_name = 'ParcelGoApp/home.html'
