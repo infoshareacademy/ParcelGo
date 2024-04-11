@@ -6,6 +6,8 @@ from .forms import ParcelLockerSearchForm, ParcelForm
 from django.db.models import Q
 import random
 from django.views.generic import TemplateView
+from django.http import HttpResponse
+
 
 def parcel_locker_search(request):
     parcel_lockers = None
@@ -122,3 +124,15 @@ def parcel_pickup(request):
 
 class HomePageView(TemplateView):
     template_name = 'ParcelGoApp/home.html'
+
+
+def track_package(request):
+    if request.method == 'POST':
+        tracking_number = request.POST.get('tracking_number')
+        try:
+            parcel = Parcel.objects.get(tracking_number=tracking_number)
+            return render(request, 'package_status.html', {'parcel': parcel})
+        except Parcel.DoesNotExist:
+            message = "Brak paczki o podanym numerze śledzenia."
+            return render(request, 'package_status.html', {'message': message})
+    return render(request, 'ParcelGoApp/track_package.html')

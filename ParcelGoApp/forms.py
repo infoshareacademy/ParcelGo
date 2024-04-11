@@ -3,10 +3,10 @@ from .models import Parcel, ParcelLocker
 
 
 # Globalne zmienne dla maksymalnych wymiarów paczki
-MAX_WEIGHT = 50  # Maximum weight in kilograms
-MAX_WIDTH = 100  # Maximum width in centimeters
-MAX_HEIGHT = 200  # Maximum height in centimeters
-MAX_DEPTH = 50  # Maximum depth in centimeters
+MAX_WEIGHT = 25  # Maximum weight in kilograms
+MAX_WIDTH = 40  # Maximum width in centimeters
+MAX_HEIGHT = 40  # Maximum height in centimeters
+MAX_DEPTH = 60  # Maximum depth in centimeters
 
 
 class ParcelLockerSearchForm(forms.Form):

@@ -9,6 +9,8 @@ urlpatterns = [
     path('delivery_approval_success/', views.delivery_approval_success, name='delivery_approval_success'),
     path('parcel/pickup/', views.parcel_pickup, name='parcel_pickup'),
     path('', views.HomePageView.as_view(), name='home'),
+    path('track/', views.track_package, name='track_package'),
+
 ]
 
 
