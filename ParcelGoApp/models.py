@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
+from django.utils import timezone
+from datetime import datetime
 
 User = get_user_model()
 
@@ -13,14 +15,14 @@ class ParcelLocker(models.Model):
     capacity = models.IntegerField(default=0)  # Pojemność paczkomatu (ilość paczek, którą może pomieścić)
 
     def __str__(self):
-        return self.locker_number
+        return f"{self.locker_number} - {self.city} {self.street} {self.street_number}"
 
 
 class Parcel(models.Model):
     DELIVERY_STATUS_CHOICES = [
         ('In delivery', 'In delivery'),
         ('Delivered', 'Delivered'),
-        ('Failed delivery', 'Failed delivery'),
+        ('Received', 'Received')
     ]
 
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -35,6 +37,13 @@ class Parcel(models.Model):
     status = models.CharField(max_length=50, choices=DELIVERY_STATUS_CHOICES, default='In delivery')
     is_approved = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
+    pickup_code = models.CharField(max_length=100, default="", blank=True)
+    received_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.tracking_number)
+        return f"{self.tracking_number} - {self.pickup_code}"
+
+    def mark_as_received(self):
+        self.status = 'Received'
+        self.received_date = timezone.make_aware(datetime.now(), timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M')
+        self.save()

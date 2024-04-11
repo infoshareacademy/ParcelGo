@@ -1,5 +1,5 @@
 from django import forms
-from .models import Parcel
+from .models import Parcel, ParcelLocker
 
 
 # Globalne zmienne dla maksymalnych wymiarów paczki
@@ -18,6 +18,10 @@ class ParcelForm(forms.ModelForm):
     width = forms.FloatField(label='Width (cm)')
     height = forms.FloatField(label='Height (cm)')
     depth = forms.FloatField(label='Depth (cm)')
+    destination_parcel_locker = forms.ModelChoiceField(queryset=ParcelLocker.objects.all(),
+                                                       label='Parcel Locker',
+                                                       to_field_name='id',
+                                                       empty_label=None)
 
     class Meta:
         model = Parcel
