@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Płatność</title>
+</head>
+<body>
+    <h2>Wymagana opłata</h2>
+    <p>Kwota do zapłaty: {{ fee }} zł</p>
+
+    <!-- Formularz zatwierdzający płatność -->
+    <form action="{% url 'confirm_payment' parcel.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Zatwierdź płatność</button>
+    </form>
+
+    <!-- Przycisk anulowania płatności -->
+    <form action="{% url 'cancel_payment' parcel.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Anuluj płatność i usuń paczkę</button>
+</form>
+</body>
+</html>

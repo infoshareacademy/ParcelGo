@@ -22,7 +22,8 @@ class Parcel(models.Model):
     DELIVERY_STATUS_CHOICES = [
         ('In delivery', 'In delivery'),
         ('Delivered', 'Delivered'),
-        ('Received', 'Received')
+        ('Received', 'Received'),
+        ('Payment_Pending', 'Payment_Pending')
     ]
 
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -31,12 +32,16 @@ class Parcel(models.Model):
     recipient_first_name = models.CharField(max_length=100)
     recipient_last_name = models.CharField(max_length=100)
     recipient_phone = models.CharField(max_length=20)
+    width = models.FloatField(default=0.0)  # Dodanie pola width
+    height = models.FloatField(default=0.0)  # Dodanie pola height
+    depth = models.FloatField(default=0.0)  # Dodanie pola depth
 
     shipping_date = models.DateTimeField(auto_now_add=True)
     description = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=50, choices=DELIVERY_STATUS_CHOICES, default='In delivery')
     is_approved = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
+    whether_paid = models.BooleanField(default=False)
     pickup_code = models.CharField(max_length=100, default="", blank=True)
     received_date = models.DateTimeField(null=True, blank=True)
 
