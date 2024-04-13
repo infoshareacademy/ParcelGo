@@ -8,8 +8,10 @@
     <h1>Welcome to ParcelGo</h1>
     <p>Choose an action:</p>
     <ul>
-        <li><a href="{% url 'login_or_register' %}">Login/Register</a></li>
-        <li><a href="{% url 'parcel_pickup' %}">Parcel Pickup</a></li>
+        <li><button type="submit"><a href="{% url 'login_or_register' %}">Login/Register</a></button></li>
+        <li><button type="submit"><a href="{% url 'parcel_pickup' %}">Parcel Pickup</a></button></li>
+        <li><button type="submit"><a href="{% url 'track_package' %}">Parcel Tracking</a></button></li>
+
     </ul>
 </body>
 </html>

@@ -3,10 +3,10 @@ from .models import Parcel, ParcelLocker
 
 
 # Globalne zmienne dla maksymalnych wymiarów paczki
-MAX_WEIGHT = 50  # Maximum weight in kilograms
-MAX_WIDTH = 100  # Maximum width in centimeters
-MAX_HEIGHT = 200  # Maximum height in centimeters
-MAX_DEPTH = 50  # Maximum depth in centimeters
+MAX_WEIGHT = 25  # Maximum weight in kilograms
+MAX_WIDTH = 40  # Maximum width in centimeters
+MAX_HEIGHT = 40  # Maximum height in centimeters
+MAX_DEPTH = 60  # Maximum depth in centimeters
 
 
 class ParcelLockerSearchForm(forms.Form):
@@ -14,10 +14,10 @@ class ParcelLockerSearchForm(forms.Form):
 
 
 class ParcelForm(forms.ModelForm):
-    weight = forms.FloatField(label='Weight (kg)')
-    width = forms.FloatField(label='Width (cm)')
-    height = forms.FloatField(label='Height (cm)')
-    depth = forms.FloatField(label='Depth (cm)')
+    weight = forms.FloatField(label=f'Weight (max {MAX_WEIGHT} kg)')
+    width = forms.FloatField(label=f'Width (max {MAX_WIDTH} cm)')
+    height = forms.FloatField(label=f'Height (max {MAX_HEIGHT} cm)')
+    depth = forms.FloatField(label=f'Depth (max {MAX_DEPTH} cm)')
     destination_parcel_locker = forms.ModelChoiceField(queryset=ParcelLocker.objects.all(),
                                                        label='Parcel Locker',
                                                        to_field_name='id',

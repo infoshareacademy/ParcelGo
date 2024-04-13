@@ -1,11 +1,14 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import ParcelLocker, Parcel
 from .forms import ParcelLockerSearchForm, ParcelForm
 from django.db.models import Q
 import random
 from django.views.generic import TemplateView
+from django.http import HttpResponse
+from django.urls import reverse
+
 
 def parcel_locker_search(request):
     parcel_lockers = None
@@ -39,22 +42,70 @@ def create_parcel(request):
         if form.is_valid():
             parcel = form.save(commit=False)
             parcel.sender = request.user
+            parcel.status = 'Payment_Pending'  # Ustawienie statusu na Payment_Pending
             parcel.save()
-            # Convert the tracking number to a string before saving it to the session
-            tracking_number_str = str(parcel.tracking_number)
-            request.session['tracking_number'] = tracking_number_str
-            return redirect('parcel_created')
+            return redirect(reverse('payment_page', kwargs={'parcel_id': parcel.id}))  # Przekierowanie do strony płatności
     else:
         form = ParcelForm()
     return render(request, 'ParcelGoApp/create_parcel.html', {'form': form})
 
 
 def parcel_created(request):
-    # Get the tracking number from the session
-    tracking_number_str = request.session.get('tracking_number', None)
-    # Remove the tracking number from the session
-    request.session.pop('tracking_number', None)
-    return render(request, 'ParcelGoApp/parcel_created.html', {'tracking_number': tracking_number_str})
+    tracking_number = request.session.get('tracking_number')
+    if not tracking_number:
+        return HttpResponse('Błąd: Numer śledzenia nie został przekazany.')
+
+    # Usuń numer śledzenia z sesji
+    del request.session['tracking_number']
+
+    return render(request, 'ParcelGoApp/parcel_created.html', {'tracking_number': tracking_number})
+
+
+def payment_page(request, parcel_id):
+    parcel = get_object_or_404(Parcel, id=parcel_id)
+    # obliczenie kwoty do zapłaty w zależności od gabarytu paczki
+    if parcel.status != 'Payment_Pending':
+        return HttpResponse('Błąd: Niepoprawny status paczki.')
+
+
+    # Obliczanie kwoty na podstawie gabarytu paczki
+    if parcel.width <= 8 or parcel.height <= 8 or parcel.depth <= 8:
+        fee = 10
+    elif parcel.width <= 19 or parcel.height <= 19 or parcel.depth <= 19:
+        fee = 13
+    elif parcel.width <= 40 and parcel.height <= 40 and parcel.depth <= 60:
+        fee = 16
+    else:
+        return HttpResponse('Błąd: Niepoprawne wymiary paczki.')
+
+    return render(request, 'ParcelGoApp/payment_page.html', {'parcel': parcel, 'fee': fee})
+def confirm_payment(request, parcel_id):
+    parcel = get_object_or_404(Parcel, id=parcel_id)
+    if request.method == 'POST':
+        # Sprawdź, czy paczka jest w stanie oczekiwania na płatność
+        if parcel.status != 'Payment_Pending':
+            return HttpResponse('Błąd: Niepoprawny status paczki.')
+
+        # Oznacz płatność jako zatwierdzoną i zmień status paczki na "In delivery"
+        parcel.whether_paid = True
+        parcel.status = 'In delivery'
+        parcel.save()
+
+        # Umieść numer śledzenia w sesji
+        request.session['tracking_number'] = str(parcel.tracking_number)
+
+        # Przekieruj użytkownika na stronę parcel_created
+        return redirect('parcel_created')
+
+def cancel_payment(request, parcel_id):
+    # Pobierz paczkę do anulowania płatności
+    parcel = get_object_or_404(Parcel, id=parcel_id)
+
+    # Usuń paczkę
+    parcel.delete()
+
+    # Przekieruj użytkownika na stronę główną lub gdziekolwiek indziej w Twojej aplikacji
+    return redirect('/users/account/')
 
 @staff_member_required
 def approve_delivery(request):
@@ -81,7 +132,11 @@ def approve_delivery(request):
         return redirect('delivery_approval_success')
 
     else:
-        pending_parcels = Parcel.objects.filter(is_approved=False).exclude(status__in=['Delivered', 'Received'])
+        pending_parcels = Parcel.objects.filter(is_approved=False).exclude(status__in=[
+            'Delivered',
+            'Received',
+            'Payment_Pending'
+        ])
         return render(request, 'ParcelGoApp/approve_delivery.html', {'pending_parcels': pending_parcels})
 
 
@@ -122,3 +177,15 @@ def parcel_pickup(request):
 
 class HomePageView(TemplateView):
     template_name = 'ParcelGoApp/home.html'
+
+
+def track_package(request):
+    if request.method == 'POST':
+        tracking_number = request.POST.get('tracking_number')
+        try:
+            parcel = Parcel.objects.get(tracking_number=tracking_number)
+            return render(request, 'package_status.html', {'parcel': parcel})
+        except Parcel.DoesNotExist:
+            message = "Brak paczki o podanym numerze śledzenia."
+            return render(request, 'package_status.html', {'message': message})
+    return render(request, 'ParcelGoApp/track_package.html')
