@@ -2,21 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Nowa Paczka</title>
+    <title>New Parcel</title>
+    <style>
+        li.error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-    <h2>Nowa Paczka</h2>
+    <h2>Send parcel</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.destination_parcel_locker.label_tag }}
+        {{ form.destination_parcel_locker }}
+        <button type="button" onclick="parcelLockerSearch()">Znajdź Paczkomat</button>
+        <br><br>
+        {{ form.recipient_first_name.label_tag }}
+        {{ form.recipient_first_name }}
+        <br><br>
+        {{ form.recipient_last_name.label_tag }}
+        {{ form.recipient_last_name }}
+        <br><br>
+        {{ form.recipient_phone.label_tag }}
+        {{ form.recipient_phone }}
+        <br><br>
+        {{ form.recipient_email.label_tag }}
+        {{ form.recipient_email }}
+        <br><br>
+        {{ form.description.label_tag }}
+        {{ form.description }}
+        <br><br>
+        {{ form.weight.label_tag }}
+        {{ form.weight }}
+        {% if form.weight.errors %}
+            <li class="error">{{ form.weight.errors }}</li>
+        {% endif %}
+        <br><br>
+        {{ form.width.label_tag }}
+        {{ form.width }}
+        {% if form.width.errors %}
+            <li class="error">{{ form.width.errors }}</li>
+        {% endif %}
+        <br><br>
+        {{ form.height.label_tag }}
+        {{ form.height }}
+        {% if form.height.errors %}
+            <li class="error">{{ form.height.errors }}</li>
+        {% endif %}
+        <br><br>
+        {{ form.depth.label_tag }}
+        {{ form.depth }}
+        {% if form.depth.errors %}
+            <li class="error">{{ form.depth.errors }}</li>
+        {% endif %}
+        <br><br>
         <button type="submit">Nadaj Paczkę</button>
     </form>
 
+    <button type="button" onclick="goBack()">Back</button>
 
-    <form action="{% url 'parcel_locker_search' %}" method="get">
-        <button type="submit">Znajdź Paczkomat</button>
-    </form>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function parcelLockerSearch() {
+
+            window.location.href = "{% url 'parcel_locker_search' %}";
+        }
+    </script>
 </body>
 </html>
-
-
