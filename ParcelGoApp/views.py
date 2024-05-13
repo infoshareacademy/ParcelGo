@@ -8,6 +8,8 @@ import random
 from django.views.generic import TemplateView
 from django.http import HttpResponse
 from django.urls import reverse
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 
 
 def parcel_locker_search(request):
@@ -50,23 +52,15 @@ def create_parcel(request):
     return render(request, 'ParcelGoApp/create_parcel.html', {'form': form})
 
 
-def parcel_created(request):
-    tracking_number = request.session.get('tracking_number')
-    if not tracking_number:
-        return HttpResponse('Błąd: Numer śledzenia nie został przekazany.')
-
-    # Usuń numer śledzenia z sesji
-    del request.session['tracking_number']
-
+def parcel_created(request, tracking_number):
     return render(request, 'ParcelGoApp/parcel_created.html', {'tracking_number': tracking_number})
 
 
 def payment_page(request, parcel_id):
     parcel = get_object_or_404(Parcel, id=parcel_id)
-    # obliczenie kwoty do zapłaty w zależności od gabarytu paczki
+
     if parcel.status != 'Payment_Pending':
         return HttpResponse('Błąd: Niepoprawny status paczki.')
-
 
     # Obliczanie kwoty na podstawie gabarytu paczki
     if parcel.width <= 8 or parcel.height <= 8 or parcel.depth <= 8:
@@ -79,6 +73,8 @@ def payment_page(request, parcel_id):
         return HttpResponse('Błąd: Niepoprawne wymiary paczki.')
 
     return render(request, 'ParcelGoApp/payment_page.html', {'parcel': parcel, 'fee': fee})
+
+
 def confirm_payment(request, parcel_id):
     parcel = get_object_or_404(Parcel, id=parcel_id)
     if request.method == 'POST':
@@ -91,11 +87,21 @@ def confirm_payment(request, parcel_id):
         parcel.status = 'In delivery'
         parcel.save()
 
-        # Umieść numer śledzenia w sesji
-        request.session['tracking_number'] = str(parcel.tracking_number)
+        # stwórz adres URL do strony  z numerem śledzenia  + Tworzenie linku
+        tracking_number = parcel.tracking_number
+        link_package_status_url = request.build_absolute_uri(reverse('link_package_status', args=[tracking_number]))
+
+        # Tworzenie wiadomości e-mail
+        subject = 'Potwierdzenie utworzenia paczki'
+        message = f'Paczka została potwierdzona i opłacona. Możesz sprawdzić jej status pod adresem: {link_package_status_url}'
+        sender_email = 'Parcel.Go.No.Reply@gmail.com'
+        recipient_email = parcel.recipient_email
+
+        send_mail(subject, message, sender_email, [recipient_email])
 
         # Przekieruj użytkownika na stronę parcel_created
-        return redirect('parcel_created')
+        return redirect(reverse('parcel_created', args=[tracking_number]))
+
 
 def cancel_payment(request, parcel_id):
     # Pobierz paczkę do anulowania płatności
@@ -104,7 +110,7 @@ def cancel_payment(request, parcel_id):
     # Usuń paczkę
     parcel.delete()
 
-    # Przekieruj użytkownika na stronę główną lub gdziekolwiek indziej w Twojej aplikacji
+    # Przekieruj użytkownika na stronę główną
     return redirect('/users/account/')
 
 @staff_member_required
@@ -126,6 +132,21 @@ def approve_delivery(request):
             pickup_code = ''.join(str(random.randint(0, 9)) for _ in range(6))
             parcel.pickup_code = pickup_code
             parcel.save()
+
+            subject = 'Potwierdzenie dostarczenia paczki do paczkomatu'
+            paczkomat_address = f'{parcel_locker.city}, {parcel_locker.street} {parcel_locker.street_number}'
+            message = (
+                f'Paczka została dostarczona do paczkomatu.\n\n'
+                f'Adres paczkomatu: {paczkomat_address}\n'
+                f'Kod odbioru: {parcel.pickup_code}\n'
+                f'Numer telefonu odbiorcy: {parcel.recipient_phone}\n\n'
+
+
+            )
+            sender_email = 'Parcel.Go.No.Reply@gmail.com'
+            recipient_email = parcel.recipient_email
+
+            send_mail(subject, message, sender_email, [recipient_email])
 
         Parcel.objects.filter(id__in=approved_parcel_ids).update(is_delivered=True, status='Delivered')
 
@@ -158,7 +179,6 @@ def parcel_pickup(request):
                 success_message = f'Parcel has already been received on {parcel.received_date}.'
                 return render(request, 'ParcelGoApp/parcel_pickup.html', {'success_message': success_message})
 
-
             # Wywołanie metody mark_as_received
             parcel.mark_as_received()
 
@@ -182,10 +202,17 @@ class HomePageView(TemplateView):
 def track_package(request):
     if request.method == 'POST':
         tracking_number = request.POST.get('tracking_number')
-        try:
-            parcel = Parcel.objects.get(tracking_number=tracking_number)
-            return render(request, 'package_status.html', {'parcel': parcel})
-        except Parcel.DoesNotExist:
-            message = "Brak paczki o podanym numerze śledzenia."
-            return render(request, 'package_status.html', {'message': message})
+        return link_package_status(request, tracking_number)
     return render(request, 'ParcelGoApp/track_package.html')
+
+
+def link_package_status(request, tracking_number):
+    try:
+        parcel = Parcel.objects.get(tracking_number=tracking_number)
+        return render(request, 'ParcelGoApp/link_package_status.html', {'parcel': parcel})
+    except Parcel.DoesNotExist:
+        message = "Brak paczki o podanym numerze śledzenia."
+        return render(request, 'ParcelGoApp/link_package_status.html', {'message': message})
+    except ValidationError:
+        message = f'"{tracking_number}" nie jest prawidłowym formatem numeru śledzenia.'
+        return render(request, 'ParcelGoApp/link_package_status.html', {'message': message})

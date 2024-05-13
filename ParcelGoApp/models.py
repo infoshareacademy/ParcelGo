@@ -32,10 +32,10 @@ class Parcel(models.Model):
     recipient_first_name = models.CharField(max_length=100)
     recipient_last_name = models.CharField(max_length=100)
     recipient_phone = models.CharField(max_length=20)
-    width = models.FloatField(default=0.0)  # Dodanie pola width
-    height = models.FloatField(default=0.0)  # Dodanie pola height
-    depth = models.FloatField(default=0.0)  # Dodanie pola depth
-
+    weight = models.FloatField(default=0.0)
+    width = models.FloatField(default=0.0)
+    height = models.FloatField(default=0.0)
+    depth = models.FloatField(default=0.0)
     shipping_date = models.DateTimeField(auto_now_add=True)
     description = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=50, choices=DELIVERY_STATUS_CHOICES, default='In delivery')
@@ -44,6 +44,7 @@ class Parcel(models.Model):
     whether_paid = models.BooleanField(default=False)
     pickup_code = models.CharField(max_length=100, default="", blank=True)
     received_date = models.DateTimeField(null=True, blank=True)
+    recipient_email = models.EmailField(max_length=254, default="")
 
     def __str__(self):
         return f"{self.tracking_number} - {self.pickup_code}"
@@ -52,3 +53,5 @@ class Parcel(models.Model):
         self.status = 'Received'
         self.received_date = timezone.make_aware(datetime.now(), timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M')
         self.save()
+
+
