@@ -1,20 +1,28 @@
-
-<html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logg In</title>
+    <title>Login</title>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
 </head>
 <body>
-
-<h2>Loging In</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Loggin</button>
-</form>
-
+    <div class="wrapper">
+        {% include 'ParcelGoApp/sidebar.html' %}
+        <div class="main-content">
+            <div class="container">                
+                <h2>Log In</h2>
+                
+                <form method="post" class="login-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="custom-button">Log In</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

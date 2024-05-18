@@ -1,32 +1,276 @@
-<html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Account</title>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
 </head>
 <body>
-    <h2>User Account</h2>
-    <p>Welcome, {{ fname }}</p>
-    <!-- Dodaj więcej treści dotyczących konta użytkownika -->
-    <form action="{% url 'create_parcel' %}" method="get">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary" style="display:inline-block; padding: 5px 10px;">Send Parcel</button>
-    </form>
-    
-    {% if user.is_staff %}
-    <form action="{% url 'approve_delivery' %}" method="get">
-        <button type="submit" class="btn btn-primary" style="display:inline-block; padding: 5px 10px;">Approve Delivery</button>
-    </form>
-    {% endif %}
-    
-    <form action="{% url 'parcel_locker_search' %}" method="get">
-        <button type="submit" class="btn btn-primary" style="display:inline-block; padding: 5px 10px;">Search for Parcel Locker</button>
-    </form>
-    
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Sign Out</button>
-    </form>
+    <div class="wrapper">
+        {% include 'ParcelGoApp/sidebar.html' %}
+        <div class="main-content">
+           <div class="header" >
+            <p>User Account</p>
+            <p>Welcome, {{ fname }}</p>
+           </div> 
+            <div class="main-account">
+                <div class="box-wrapper">
+                    <div class="box">
+                        <h2>My Account</h2>
+                        
+                            <button onclick="openPopup('changePasswordPopup')">Change Password</button>
+                        
+                            <button onclick="openPopup('changeUsernamePopup')">Change Username</button>
+                        
+                            <button onclick="openPopup('changeEmailPopup')">Change Email</button>
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">Sign Out</button>
+                            </form>
+                        
+                    </div>
+                    <div class="box">
+                       <h2>Parcel Services</h2>     
+                            <form action="{% url 'parcel_locker_search' %}" method="get">
+                                <button type="submit" class="btn btn-primary">Parcel Locker Finder</button>
+                            </form>
+                            <form action="{% url 'track_package' %}" method="get">
+                                <button type="submit" class="btn btn-primary">Parcel Tracking</button>
+                            </form>
+                            <form action="{% url 'create_parcel' %}" method="get">
+                                <button type="submit" class="btn btn-primary">Send Parcel</button>
+                            </form>
+                            <form action="{% url 'parcel_pickup' %}" method="get">
+                                <button type="submit" class="btn btn-primary">Parcel Pickup</button>
+                            </form>
+                    </div>
+                    {% if user.is_staff %}
+                    <div class="box">
+                        <h2>Employee Tools</h2> 
+                        </form>
+                            <form action="{% url 'approve_delivery' %}" method="get">
+                                <button type="submit" class="btn btn-primary">Approve Delivery</button>
+                            </form>
+                    </div>
+                    {% endif %}
+                </div>    
+            </div>
+            <!-- Popup dla zmiany hasła -->
+            <div id="changePasswordPopup" class="popup">
+                <h3>Change Password</h3>
+                <!-- Formularz zmiany hasła -->
+                <input id="oldPassword" type="password" placeholder="Old Password">
+                <input id="newPassword" type="password" placeholder="New Password">
+                <input id="newPassword2" type="password" placeholder="New Password2">
+                <p id="changePasswordError" class="error-message"></p>
+                
+                <div class="container">
+                    <button onclick="changePassword()">Change</button>
+                    <button onclick="closePopup('changePasswordPopup', ['oldPassword', 'newPassword', 'newPassword2'])">Close</button>
+                </div>
+            </div>
+            
+            <!-- Popup dla zmiany nazwy użytkownika -->
+            <div id="changeUsernamePopup" class="popup">
+                <h3>Change Username</h3>
+                
+                <input id="newUsername" type="text" placeholder="New Username">
+                <p id="changeUsernameError" class="error-message"></p>
+                
+                <div class="container">
+                    <button onclick="changeUsername()">Change</button>
+                    <button onclick="closePopup('changeUsernamePopup', ['newUsername'])">Close</button>
+                </div>
+            </div>
+            
+            <!-- Popup dla zmiany adresu email -->
+            <div id="changeEmailPopup" class="popup">
+               <h3>Change Email</h3>
+               
+               <input id="newEmail" type="email" placeholder="New Email">
+               <p id="changeEmailError" class="error-message"></p>
+               
+               <div class="container">
+                   <button onclick="changeEmail()">Change</button>
+                   <button onclick="closePopup('changeEmailPopup', ['newEmail'])">Close</button>
+               </div>
+            
+        </div>
+    </div>
+</body>
+</html>
 
+    <script>
+        // Funkcja otwierająca popup
+function openPopup(popupId) {
+    document.getElementById(popupId).style.display = "block";
+}
+
+// Funkcja zamykająca popup
+function closePopup(popupId, fieldsToClear) {
+    document.getElementById(popupId).style.display = "none";
+    // Wyczyść odpowiednie pola
+    fieldsToClear.forEach(function(fieldId) {
+        document.getElementById(fieldId).value = '';
+    });
+}
+
+
+function changePassword() {
+    var oldPassword = document.getElementById("oldPassword").value;
+    var newPassword = document.getElementById("newPassword").value;
+
+    // Utwórz obiekt FormData i dodaj do niego stare i nowe hasło
+    var formData = new FormData();
+    formData.append('old_password', oldPassword);
+    formData.append('new_password1', newPassword);
+    formData.append('new_password2', newPassword); // Dodaj drugie nowe hasło dla potwierdzenia
+
+    // Wyślij żądanie AJAX do serwera
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/users/change-password/', true); 
+    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}'); // Dodaj token CSRF
+    xhr.onload = function () {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+            
+            var successText = document.createElement('p');
+            successText.style.color = 'green';
+            successText.textContent = 'Password has been changed successfully!';
+            document.getElementById('changePasswordPopup').appendChild(successText);
+            document.getElementById("oldPassword").value = "";
+            document.getElementById("newPassword").value = "";
+            document.getElementById("newPassword2").value = "";
+        } else {
+            // Jeśli wystąpił błąd, wyświetl komunikaty błędów
+            for (var key in response.errors) {
+                if (response.errors.hasOwnProperty(key)) {
+                    response.errors[key].forEach(function(error) {
+                        var errorText = document.createElement('p');
+                        errorText.style.color = 'red';
+                        errorText.textContent = error.message;
+                        document.getElementById('changePasswordPopup').appendChild(errorText);
+                        document.getElementById("oldPassword").value = "";
+                        document.getElementById("newPassword").value = "";
+                        document.getElementById("newPassword2").value = "";
+                    });
+                }
+            }
+        }
+    };
+    xhr.send(formData);
+    // Usuń komunikaty o sukcesie po zamknięciu popupu
+    document.getElementById('changePasswordPopup').addEventListener('mouseleave', function() {
+        var successText = document.getElementById('changePasswordPopup').querySelectorAll('p');
+        successText.forEach(function(elem) {
+            elem.remove();
+        });
+    });
+    // Usuń komunikaty o błędach po zamknięciu popupu
+    document.getElementById('changePasswordPopup').addEventListener('mouseleave', function() {
+        var errorText = document.getElementById('changePasswordPopup').querySelectorAll('p');
+        errorText.forEach(function(elem) {
+            elem.remove();
+        });
+    });
+}
+
+
+function changeUsername() {
+    // Pobierz nową nazwę użytkownika z pola formularza
+    var newUsername = document.getElementById("newUsername").value;
+
+    // Utwórz obiekt FormData i dodaj do niego nową nazwę użytkownika
+    var formData = new FormData();
+    formData.append('new_username', newUsername);
+
+    // żądanie AJAX do serwera
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/users/change-username/', true);
+    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}'); // Dodaj token CSRF
+    xhr.onload = function () {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+            
+            var successText = document.createElement('p');
+            successText.style.color = 'green';
+            successText.textContent = 'Username has been changed successfully!';
+            document.getElementById('changeUsernamePopup').appendChild(successText);
+        } else {
+            
+            var errorText = document.createElement('p');
+            errorText.style.color = 'red';
+            errorText.textContent = response.error;
+            document.getElementById('changeUsernamePopup').appendChild(errorText);
+        }
+    };
+    xhr.send(formData);
+    
+    
+    document.getElementById('changeUsernamePopup').addEventListener('mouseleave', function() {
+        var successText = document.getElementById('changeUsernamePopup').querySelectorAll('p');
+        successText.forEach(function(elem) {
+            elem.remove();
+        });
+    });
+    
+    document.getElementById('changeUsernamePopup').addEventListener('mouseleave', function() {
+        var errorText = document.getElementById('changeUsernamePopup').querySelectorAll('p');
+        errorText.forEach(function(elem) {
+            elem.remove();
+        });
+    });
+}
+
+function changeEmail() {
+    // Pobierz nowy adres email z pola formularza
+    var newEmail = document.getElementById("newEmail").value;
+
+    // Utwórz obiekt FormData i dodaj do niego nowy adres email
+    var formData = new FormData();
+    formData.append('new_email', newEmail);
+
+    // Wyślij żądanie AJAX do serwera
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/users/change-email/', true);
+    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}'); 
+    xhr.onload = function () {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+            
+            var successText = document.createElement('p');
+            successText.style.color = 'green';
+            successText.textContent = 'Email has been changed successfully!';
+            document.getElementById('changeEmailPopup').appendChild(successText);
+        } else {
+            
+            var errorText = document.createElement('p');
+            errorText.style.color = 'red';
+            errorText.textContent = response.error;
+            document.getElementById('changeEmailPopup').appendChild(errorText);
+            
+            
+        }
+    };
+    xhr.send(formData);
+    
+    
+    document.getElementById('changeEmailPopup').addEventListener('mouseleave', function() {
+        var successText = document.getElementById('changeEmailPopup').querySelectorAll('p');
+        successText.forEach(function(elem) {
+            elem.remove();
+        });
+    });
+   
+    document.getElementById('changeEmailPopup').addEventListener('mouseleave', function() {
+        var errorText = document.getElementById('changeEmailPopup').querySelectorAll('p');
+        errorText.forEach(function(elem) {
+            elem.remove();
+        });
+    });
+}
+    </script>
 </body>
 </html>

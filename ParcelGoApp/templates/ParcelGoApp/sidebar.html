@@ -1,0 +1,121 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ParcelGo Home</title>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
+
+
+</head>
+<body>
+    <div class="sidebar">
+        <div class="top">
+
+                <a href="{% url 'home' %}" class="logo-link">
+                    <div class="logo">
+                        <i class='bx bx-package'></i>
+                        <span>ParcelGo</span>
+                    </div>
+                </a>
+                <i class="bx bx-menu" id="btn"></i>
+
+        </div>
+
+        <div class="user">
+            {% if user.is_authenticated %}
+            <a href="{% url 'user_account' %}" class="user-acc-link">
+                <img src="../../static/default-user-pic.jpg" alt="user_icon" class="user-img">
+                <p class="name">{{ fname }}</p>
+
+            </a>
+
+            {% endif %}
+        </div>
+
+        <div class="sidebar-wrapper {% if user.is_authenticated %}authenticated{% else %}anonymous{% endif %}">
+            <ul>
+            {% if not user.is_authenticated %}
+            <li>
+                <a href="{% url 'login_or_register' %}">
+                    <i class='bx bx-log-in-circle'></i>
+                    <span class="nav-item">Log In/Register</span>
+                </a>
+                <span class="tooltip">Log In/Register</span>
+            </li>
+            {% endif %}
+            <li>
+                <a href="{% url 'parcel_pickup' %}">
+                    <i class='bx bx-box'></i>
+                    <span class="nav-item">Parcel Pickup</span>
+                </a>
+                <span class="tooltip">Parcel Pickup</span>
+            </li>
+            <li>
+                <a href="{% url 'track_package' %}">
+                    <i class='bx bx-map-pin'></i>
+                    <span class="nav-item">Parcel Tracking</span>
+                </a>
+                <span class="tooltip">Parcel Tracking</span>
+            </li>
+            {% if user.is_staff %}
+            <li>
+                <a href="{% url 'approve_delivery' %}">
+                    <i class='bx bxs-archive-in'></i>
+                    <span class="nav-item">Approve Delivery</span>
+                </a>
+                <span class="tooltip">Approve Delivery</span>
+            </li>
+            {% endif %}
+            <li>
+                <a href="{% url 'parcel_locker_search' %}">
+                    <i class='bx bx-search-alt'></i>
+                    <span class="nav-item">Parcel Locker Finder</span>
+                </a>
+                <span class="tooltip">Parcel Locker Finder</span>
+            </li>
+            {% if user.is_authenticated %}
+            <li>
+                <a href="{% url 'create_parcel' %}">
+                    <i class='bx bx-mail-send'></i>
+                    <span class="nav-item">Send Parcel</span>
+                </a>
+                <span class="tooltip">Send Parcel</span>
+            </li>
+
+            <li>
+                <form id="logout-form" action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button id="logout-btn" type="submit" style="display: none;"></button>
+                </form>
+                <a href="#" onclick="document.getElementById('logout-btn').click();">
+                    <i class='bx bxs-log-out'></i>
+                    <span class="nav-item">Logout</span>
+                </a>
+                <span class="tooltip">Logout</span>
+            </li>
+
+            {% endif %}
+
+
+            </ul>
+        </div>
+    </div>
+
+
+</body>
+
+<script>
+
+    let btn = document.querySelector("#btn");
+    let sidebar = document.querySelector(".sidebar");
+
+
+    btn.onclick = function () {
+        sidebar.classList.toggle("active");
+    };
+</script>
+</html>

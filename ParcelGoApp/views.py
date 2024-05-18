@@ -1,6 +1,9 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+
 from .models import ParcelLocker, Parcel
 from .forms import ParcelLockerSearchForm, ParcelForm
 from django.db.models import Q
@@ -13,8 +16,18 @@ from django.core.mail import send_mail
 
 
 def parcel_locker_search(request):
+
+
     parcel_lockers = None
     no_results_message = None
+
+    user = request.user
+
+    # Przekazanie imienia użytkownika do kontekstu, jeśli użytkownik jest zalogowany
+    if user.is_authenticated:
+        fname = user.first_name
+    else:
+        fname = None
 
     if request.method == 'GET':
         form = ParcelLockerSearchForm(request.GET)
@@ -27,14 +40,15 @@ def parcel_locker_search(request):
                 )
 
                 if not parcel_lockers.exists():
-                    no_results_message = f"Brak wyników dla zapytania: '{search_query}'"
+                    no_results_message = f"No results found for your query: '{search_query}'"
     else:
         form = ParcelLockerSearchForm()
 
     return render(request, 'ParcelGoApp/parcel_locker_search.html', {
         'form': form,
         'parcel_lockers': parcel_lockers,
-        'no_results_message': no_results_message
+        'no_results_message': no_results_message,
+        'fname': fname,
     })
 
 
@@ -44,12 +58,23 @@ def create_parcel(request):
         if form.is_valid():
             parcel = form.save(commit=False)
             parcel.sender = request.user
-            parcel.status = 'Payment_Pending'  # Ustawienie statusu na Payment_Pending
+            parcel.status = 'Payment_Pending'
             parcel.save()
-            return redirect(reverse('payment_page', kwargs={'parcel_id': parcel.id}))  # Przekierowanie do strony płatności
+            return redirect(reverse('payment_page', kwargs={'parcel_id': parcel.id}))
     else:
         form = ParcelForm()
-    return render(request, 'ParcelGoApp/create_parcel.html', {'form': form})
+
+    # Przekazanie informacji o zalogowanym użytkowniku do kontekstu renderowania
+    user = request.user
+    if user.is_authenticated:
+        fname = user.first_name
+    else:
+        fname = None
+
+    return render(request, 'ParcelGoApp/create_parcel.html', {
+        'form': form,
+        'fname': fname,  # Dodaj to do kontekstu
+    })
 
 
 def parcel_created(request, tracking_number):
@@ -77,6 +102,8 @@ def payment_page(request, parcel_id):
 
 def confirm_payment(request, parcel_id):
     parcel = get_object_or_404(Parcel, id=parcel_id)
+
+
     if request.method == 'POST':
         # Sprawdź, czy paczka jest w stanie oczekiwania na płatność
         if parcel.status != 'Payment_Pending':
@@ -166,6 +193,11 @@ def delivery_approval_success(request):
 
 
 def parcel_pickup(request):
+    user = request.user
+    if user.is_authenticated:
+        fname = user.first_name
+    else:
+        fname = None
     if request.method == 'POST':
         recipient_phone = request.POST.get('recipient_phone')
         pickup_code = request.POST.get('pickup_code')
@@ -192,18 +224,35 @@ def parcel_pickup(request):
         except Parcel.DoesNotExist:
             messages.error(request, 'Invalid recipient phone or pickup code.')
 
-    return render(request, 'ParcelGoApp/parcel_pickup.html')
+    return render(request, 'ParcelGoApp/parcel_pickup.html', {'fname': fname})
 
 
 class HomePageView(TemplateView):
     template_name = 'ParcelGoApp/home.html'
+    def get_context_data(self, **kwargs):
+        context = {}
+        if self.request.user.is_authenticated:
+            user = self.request.user
+            authenticated_user_name = user.first_name
+            context['fname'] = authenticated_user_name
+        return context
 
 
 def track_package(request):
     if request.method == 'POST':
         tracking_number = request.POST.get('tracking_number')
         return link_package_status(request, tracking_number)
-    return render(request, 'ParcelGoApp/track_package.html')
+
+
+    user = request.user
+    if user.is_authenticated:
+        fname = user.first_name
+    else:
+        fname = None
+
+    return render(request, 'ParcelGoApp/track_package.html', {
+        'fname': fname,
+    })
 
 
 def link_package_status(request, tracking_number):
@@ -216,3 +265,11 @@ def link_package_status(request, tracking_number):
     except ValidationError:
         message = f'"{tracking_number}" nie jest prawidłowym formatem numeru śledzenia.'
         return render(request, 'ParcelGoApp/link_package_status.html', {'message': message})
+
+
+#class SidebarView(LoginRequiredMixin, View):
+#     template_name = 'ParcelGoApp/sidebar.html'
+#     def get(self, request):
+#         authenticated_user_name = request.user.first_name if request.user.is_authenticated else None
+#         return render(request, 'ParcelGoApp/sidebar.html', {'authenticated_user_name': authenticated_user_name})
+

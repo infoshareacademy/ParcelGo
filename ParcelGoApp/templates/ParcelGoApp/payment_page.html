@@ -1,23 +1,35 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Płatność</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-    <h2>Wymagana opłata</h2>
-    <p>Kwota do zapłaty: {{ fee }} zł</p>
+    <div class="wrapper">
 
-    <!-- Formularz zatwierdzający płatność -->
-    <form action="{% url 'confirm_payment' parcel.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Zatwierdź płatność</button>
-    </form>
+        <div class="main-content payment-content">
+            <div class="header">
+                <h2>Fee required</h2>
+            </div>
+            <div class="content">
+                <p>Amount to pay: {{ fee }} zł</p>
 
-    <!-- Przycisk anulowania płatności -->
-    <form action="{% url 'cancel_payment' parcel.id %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Anuluj płatność i usuń paczkę</button>
-</form>
+
+                <form action="{% url 'confirm_payment' parcel.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-confirm">Zatwierdź płatność</button>
+                </form>
+
+
+                <form action="{% url 'cancel_payment' parcel.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-cancel">Anuluj płatność i usuń paczkę</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

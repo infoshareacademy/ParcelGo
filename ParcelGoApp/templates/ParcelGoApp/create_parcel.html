@@ -1,8 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Parcel</title>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
     <style>
         li.error {
             color: red;
@@ -10,56 +13,85 @@
     </style>
 </head>
 <body>
-    <h2>Send parcel</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.destination_parcel_locker.label_tag }}
-        {{ form.destination_parcel_locker }}
-        <button type="button" onclick="parcelLockerSearch()">Znajdź Paczkomat</button>
-        <br><br>
-        {{ form.recipient_first_name.label_tag }}
-        {{ form.recipient_first_name }}
-        <br><br>
-        {{ form.recipient_last_name.label_tag }}
-        {{ form.recipient_last_name }}
-        <br><br>
-        {{ form.recipient_phone.label_tag }}
-        {{ form.recipient_phone }}
-        <br><br>
-        {{ form.recipient_email.label_tag }}
-        {{ form.recipient_email }}
-        <br><br>
-        {{ form.description.label_tag }}
-        {{ form.description }}
-        <br><br>
-        {{ form.weight.label_tag }}
-        {{ form.weight }}
-        {% if form.weight.errors %}
-            <li class="error">{{ form.weight.errors }}</li>
-        {% endif %}
-        <br><br>
-        {{ form.width.label_tag }}
-        {{ form.width }}
-        {% if form.width.errors %}
-            <li class="error">{{ form.width.errors }}</li>
-        {% endif %}
-        <br><br>
-        {{ form.height.label_tag }}
-        {{ form.height }}
-        {% if form.height.errors %}
-            <li class="error">{{ form.height.errors }}</li>
-        {% endif %}
-        <br><br>
-        {{ form.depth.label_tag }}
-        {{ form.depth }}
-        {% if form.depth.errors %}
-            <li class="error">{{ form.depth.errors }}</li>
-        {% endif %}
-        <br><br>
-        <button type="submit">Nadaj Paczkę</button>
-    </form>
+    <div class="wrapper">
+        {% include 'ParcelGoApp/sidebar.html' %}
+        <div class="main-content">
+            <div class="header">
+                <h2>Send parcel</h2>
+            </div>
 
-    <button type="button" onclick="goBack()">Back</button>
+            <form method="post" class="compact-form">
+                {% csrf_token %}
+
+                <div class="form-field">
+                    {{ form.destination_parcel_locker.label_tag }}
+                    {{ form.destination_parcel_locker }}
+
+                </div>
+
+                <div class="form-field">
+                    {{ form.recipient_first_name.label_tag }}
+                    {{ form.recipient_first_name }}
+                </div>
+
+                <div class="form-field">
+                    {{ form.recipient_last_name.label_tag }}
+                    {{ form.recipient_last_name }}
+                </div>
+
+                <div class="form-field">
+                    {{ form.recipient_phone.label_tag }}
+                    {{ form.recipient_phone }}
+                </div>
+
+                <div class="form-field">
+                    {{ form.recipient_email.label_tag }}
+                    {{ form.recipient_email }}
+                </div>
+
+                <div class="form-field">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                </div>
+
+                <div class="form-field">
+                    {{ form.weight.label_tag }}
+                    {{ form.weight }}
+                    {% if form.weight.errors %}
+                        <li class="error">{{ form.weight.errors }}</li>
+                    {% endif %}
+                </div>
+
+                <div class="form-field">
+                    {{ form.width.label_tag }}
+                    {{ form.width }}
+                    {% if form.width.errors %}
+                        <li class="error">{{ form.width.errors }}</li>
+                    {% endif %}
+                </div>
+
+                <div class="form-field">
+                    {{ form.height.label_tag }}
+                    {{ form.height }}
+                    {% if form.height.errors %}
+                        <li class="error">{{ form.height.errors }}</li>
+                    {% endif %}
+                </div>
+
+                <div class="form-field">
+                    {{ form.depth.label_tag }}
+                    {{ form.depth }}
+                    {% if form.depth.errors %}
+                        <li class="error">{{ form.depth.errors }}</li>
+                    {% endif %}
+                </div>
+
+                <button type="submit">Send Parcel</button>
+            </form>
+
+            <button type="button" onclick="goBack()" class="back-button">Back</button>
+        </div>
+    </div>
 
     <script>
         function goBack() {
@@ -67,7 +99,6 @@
         }
 
         function parcelLockerSearch() {
-
             window.location.href = "{% url 'parcel_locker_search' %}";
         }
     </script>

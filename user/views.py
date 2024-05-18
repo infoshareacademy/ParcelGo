@@ -6,8 +6,12 @@ from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from .forms import SignUpForm
 from django.views import View
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
-
+User = get_user_model()
 
 class SignUpView(CreateView):
     form_class = SignUpForm
@@ -43,14 +47,68 @@ class UserAccountView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Pobierz dane użytkownika lub wykonaj inne czynności związane z kontem użytkownika
-        # Na przykład:
+        # Pobierz dane użytkownika
         user = self.request.user
         fname = user.first_name  # Pobierz imię użytkownika
         lname = user.last_name
-        # tutaj miejsce na wiecej operacji z kontem
 
         context['fname'] = fname
         context['lname'] = lname
         # nowe dane do przekazania do szablonu
         return context
+
+
+def change_username(request):
+    if request.method == 'POST':
+        new_username = request.POST.get('new_username')
+
+        if not new_username:
+            error_message = 'Username cannot be empty.'
+            return JsonResponse({'success': False, 'error': error_message})
+
+        if User.objects.filter(username=new_username).exists():
+            error_message = 'This username is already taken please choose another one.'
+            return JsonResponse({'success': False, 'error': error_message})
+
+        user = request.user
+
+        user.username = new_username
+        user.save()
+
+        return JsonResponse({'success': True})
+    else:
+        error_message = 'Invalid request method'
+        return JsonResponse({'success': False, 'error': error_message})
+
+class ChangePasswordView(View):
+    def post(self, request, *args, **kwargs):
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Aktualizuj sesję użytkownika po zmianie hasła
+            update_session_auth_hash(request, user)
+            return JsonResponse({'success': True})
+        else:
+            # Jeśli formularz nie jest poprawny, zwróć błędy dla każdego pola osobno
+            errors = form.errors.get_json_data()
+            return JsonResponse({'success': False, 'errors': errors})
+
+class ChangeEmailView(View):
+    def post(self, request, *args, **kwargs):
+        new_email = request.POST.get('new_email')
+        user = request.user
+
+        if not new_email:
+            error_message = 'Email address cannot be empty.'
+            return JsonResponse({'success': False, 'error': error_message})
+
+        # Sprawdź, czy nowy adres email nie jest już używany przez innego użytkownika
+        if User.objects.filter(email=new_email).exists():
+            error_message = 'This email address is already associated with another account.'
+            return JsonResponse({'success': False, 'error': error_message})
+
+        # Zaktualizuj adres email użytkownika
+        user.email = new_email
+        user.save()
+
+        return JsonResponse({'success': True})
