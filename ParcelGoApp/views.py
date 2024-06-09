@@ -13,7 +13,13 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-
+import qrcode
+import json
+from io import BytesIO
+from qrcode.image.pil import PilImage
+from django.core.mail import EmailMultiAlternatives
+from email.mime.image import MIMEImage
+from django.template.loader import render_to_string
 
 def parcel_locker_search(request):
 
@@ -176,18 +182,34 @@ def approve_delivery(request):
             parcel.pickup_code = pickup_code
             parcel.save()
 
+            qr_data = json.dumps({"pick_up_code": parcel.pickup_code, "phone_number": parcel.recipient_phone})
+            qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+            qr.add_data(qr_data)
+            qr.make(fit=True)
+            img = qr.make_image(fill='black', back_color='white', image_factory=PilImage)
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            buffer.seek(0)
+
             subject = "Potwierdzenie dostarczenia paczki do paczkomatu"
             paczkomat_address = f"{parcel_locker.city}, {parcel_locker.street} {parcel_locker.street_number}"
-            message = (
-                f"Paczka została dostarczona do paczkomatu.\n\n"
-                f"Adres paczkomatu: {paczkomat_address}\n"
-                f"Kod odbioru: {parcel.pickup_code}\n"
-                f"Numer telefonu odbiorcy: {parcel.recipient_phone}\n\n"
-            )
+            html_content = render_to_string('ParcelGoApp/mail_template.html',
+                                            {'paczkomat_address': paczkomat_address,
+                                             'pickup_code': parcel.pickup_code,
+                                             'recipient_phone': parcel.recipient_phone})
+
             sender_email = "Parcel.Go.No.Reply@gmail.com"
             recipient_email = parcel.recipient_email
 
-            send_mail(subject, message, sender_email, [recipient_email])
+            email = EmailMultiAlternatives(subject, html_content, sender_email, [recipient_email])
+            email.attach_alternative(html_content, "text/html")
+
+            qr_code_image = MIMEImage(buffer.read())
+            qr_code_image.add_header('Content-ID', '<qr_code>')
+            qr_code_image.add_header('Content-Disposition', 'inline', filename='qr_code.png')
+            email.attach(qr_code_image)
+
+            email.send()
 
         Parcel.objects.filter(id__in=approved_parcel_ids).update(
             is_delivered=True, status="Delivered"
