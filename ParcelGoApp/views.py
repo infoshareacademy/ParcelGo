@@ -23,11 +23,10 @@ def parcel_locker_search(request):
     user = request.user
 
     # Przekazanie imienia użytkownika do kontekstu, jeśli użytkownik jest zalogowany
+    fname = None
     if user.is_authenticated:
         fname = user.first_name
-    else:
-        fname = None
-
+    
     if request.method == "GET":
         form = ParcelLockerSearchForm(request.GET)
         if form.is_valid():
