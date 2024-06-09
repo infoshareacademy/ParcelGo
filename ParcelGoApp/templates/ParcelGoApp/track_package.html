@@ -1,19 +1,30 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Package</title>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
 </head>
 <body>
-    <h1>Track Package</h1>
-    <form method="POST">
-        {% csrf_token %}
-        <label for="tracking_number">Enter tracking number:</label>
-        <input type="text" id="tracking_number" name="tracking_number">
-        <button type="submit">Track</button>
-    </form>
-    <br>
-    <button type="submit"><a href="{% url 'home' %}">Back to Home</a></button>
+    <div class="wrapper">
+
+        {% include 'ParcelGoApp/sidebar.html' %}
+
+        <div class="main-content">
+            <h1>Track Package</h1>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="tracking_number">Enter tracking number:</label>
+                <input type="text" id="tracking_number" name="tracking_number">
+                <button type="submit" formtarget="_blank">Track</button>
+            </form>
+            <div class="back-button">
+                <a href="{% url 'home' %}" class="back-link">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

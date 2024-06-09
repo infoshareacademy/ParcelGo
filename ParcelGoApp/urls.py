@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('parcel-lockers/search/', views.parcel_locker_search, name='parcel_locker_search'),
@@ -16,4 +19,5 @@ urlpatterns = [
     path('link_package_status/<str:tracking_number>/', views.link_package_status, name='link_package_status'),
 
 
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

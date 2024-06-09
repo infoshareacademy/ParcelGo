@@ -1,59 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyszukiwanie Paczkomatu</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <title>Parcel Locker Search</title>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
 </head>
 <body>
-    <h1>Wyszukiwanie Paczkomatu</h1>
-    <form method="get">
-        {{ form.as_p }}
-        <button type="submit">Search</button>
-    </form>
+    <div class="wrapper">
 
-    {% if no_results_message %}
-        <p>{{ no_results_message }}</p>
-    {% endif %}
 
-    {% if parcel_lockers %}
-        <h2>Lista urządzeń o wskazanym parametrze</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Numer urządzenia</th>
-                    <th>Adres</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for parcel_locker in parcel_lockers %}
-                    <tr>
-                        <td>{{ parcel_locker.locker_number }}</td>
-                        <td>{{ parcel_locker.city }} - {{ parcel_locker.street }} {{ parcel_locker.street_number }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="2">Brak wyników</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-    <button type="button" onclick="goBack()">Back</button>
+        {% include 'ParcelGoApp/sidebar.html' %}
+
+        <div class="main-content">
+            <h1>Parcel Locker Search</h1>
+            <form class="parcel-locker-form" method="get">
+                {{ form.as_p }}
+                <button type="submit">Search</button>
+            </form>
+
+            {% if no_results_message %}
+                <p>{{ no_results_message }}</p>
+            {% endif %}
+
+            {% if parcel_lockers %}
+                <h2>List of devices with the indicated parameter</h2>
+                <div class="result-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Device number</th>
+                                <th>Adress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for parcel_locker in parcel_lockers %}
+                                <tr>
+                                    <td>{{ parcel_locker.locker_number }}</td>
+                                    <td>{{ parcel_locker.city }} - {{ parcel_locker.street }} {{ parcel_locker.street_number }}</td>
+                                </tr>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            <div class="back-button">
+                <a href="{% url 'home' %}" class="back-link">Back to Home</a>
+            </div>
+        </div>
+    </div>
 
     <script>
         function goBack() {

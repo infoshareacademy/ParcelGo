@@ -1,19 +1,27 @@
-<html>
+{% load static %}
+<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ParcelGo</title>
-</head>
-<body>
-    
-    <h3>Please sign in or register if you don't have an account</h3>
-    
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
 
-    <button type="submit"><a href="{% url 'login' %}">Sign In</a></button>
-    <button type="submit"><a href="{% url 'register' %}">Register</a></button>
-    
-    <br><br>
-    <button type="submit"><a href="{% url 'home' %}">Back to Home</a></button>
-    
+<body>
+    <div class="wrapper">
+        {% include 'ParcelGoApp/sidebar.html' %}
+        <div class="main-content log-or-reg-wrapper">
+            <div class="container">
+                <h3>Please sign in or register if you don't have an account</h3>
+
+                <button class="custom-button" onclick="window.location.href='{% url 'login' %}'">Sign In</button>
+                <button class="custom-button" onclick="window.location.href='{% url 'register' %}'">Register</button>
+
+                <br><br>
+                <button class="custom-button" onclick="window.location.href='{% url 'home' %}'">Back to Home</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+
+

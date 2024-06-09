@@ -1,16 +1,20 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Parcel Created</title>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
 </head>
 <body>
-    <h2>Parcel Created</h2>
-    <p>A new parcel has been successfully created!</p>
-    <p>Tracking number: {{ tracking_number }}</p>
+    <div class="parcel-created-container">
+        <h2>Parcel Created</h2>
+        <p>A new parcel has been successfully created!</p>
+        <p>Tracking number: {{ tracking_number }}</p>
 
-    <form action="/users/account/" method="get">
-        <button type="submit">Back to User Account</button>
-    </form>
+        <form action="/users/account/" method="get">
+            <button type="submit">Back to User Account</button>
+        </form>
+    </div>
 </body>
 </html>

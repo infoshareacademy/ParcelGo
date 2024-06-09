@@ -1,17 +1,41 @@
+
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ParcelGo Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParcelGo main page</title>
+    <link type="text/css" href="{% static 'style.css' %}" rel="stylesheet">
+
 </head>
 <body>
-    <h1>Welcome to ParcelGo</h1>
-    <p>Choose an action:</p>
-    <ul>
-        <li><button type="submit"><a href="{% url 'login_or_register' %}">Login/Register</a></button></li>
-        <li><button type="submit"><a href="{% url 'parcel_pickup' %}">Parcel Pickup</a></button></li>
-        <li><button type="submit"><a href="{% url 'track_package' %}">Parcel Tracking</a></button></li>
+    <div class="wrapper">
+        {% include 'ParcelGoApp/sidebar.html' %}
+        <div class="main-content">
+            <div class="container">
+                <h1>ParcelGo main page</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tincidunt dolor nec pulvinar aliquam.
+                    Praesent bibendum felis eu ipsum efficitur, a dapibus neque porta. Pellentesque ut nisi sed nunc
+                    viverra vulputate eu eu ipsum. Praesent erat tellus, rutrum vel diam a, laoreet fermentum est. Ut
+                    elementum, eros vel posuere efficitur, purus elit finibus nulla, id viverra metus risus ut turpis.
+                    In in dui et tortor tincidunt mollis at bibendum lacus. Quisque pharetra consectetur porta. Maecenas
+                    sodales odio vitae nulla interdum tristique. Integer id erat vel nulla tincidunt ultrices ut sed
+                    lorem. Curabitur eu porta lorem. Ut commodo orci et neque molestie ornare.
+                </p>
 
-    </ul>
+                <p>
+                    Nullam sodales congue porttitor. Vivamus bibendum lorem ex, ac lacinia tortor dictum at. Morbi
+                    volutpat aliquam enim, non mollis orci bibendum eu. Vivamus eu pulvinar lorem. Aenean id metus quis
+                    leo eleifend sodales. Praesent egestas sem nec ante lacinia, nec mattis sem pellentesque. Duis eget
+                    vestibulum erat, ac malesuada leo. Nullam efficitur ipsum mattis, ultricies lorem sed, mattis odio.
+                    Vivamus sollicitudin augue sapien, sed egestas dui maximus id. Vestibulum tempor vitae urna non
+                    facilisis. Suspendisse non placerat neque, non iaculis dolor. Nam aliquam pellentesque tellus quis
+                    condimentum. Ut et pulvinar enim, a mattis nibh.
+                </p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

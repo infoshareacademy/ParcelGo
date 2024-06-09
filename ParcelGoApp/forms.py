@@ -10,7 +10,7 @@ MAX_DEPTH = 60  # Maximum depth in centimeters
 
 
 class ParcelLockerSearchForm(forms.Form):
-    search_query = forms.CharField(label='Wpisz miasto lub nr. urzadzenia które chcesz sprawdzić', max_length=100, required=False)
+    search_query = forms.CharField(label='Enter the city name or number of the device you want to check:', max_length=100, required=False)
 
 
 class ParcelForm(forms.ModelForm):
