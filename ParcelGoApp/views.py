@@ -72,10 +72,9 @@ def create_parcel(request):
 
     # Przekazanie informacji o zalogowanym użytkowniku do kontekstu renderowania
     user = request.user
+    fname = None
     if user.is_authenticated:
-        fname = user.first_name
-    else:
-        fname = None
+        fname = user.first_name        
 
     return render(
         request,
