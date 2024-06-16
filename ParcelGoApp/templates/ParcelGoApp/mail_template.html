@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potwierdzenie dostarczenia paczki</title>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+
+        .email-content {
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 40%;
+            margin: auto;
+        }
+
+        .qr-code {
+            margin: 20px auto;
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="email-content">
+
+        <p style="text-align: center; font-size: 18px;">Paczka czeka na Ciebie w skrytce.</p>
+
+        <p style="text-align: center;">Twój Paczkomat: <strong>{{ paczkomat_address }}</strong></p>
+
+        <img src="cid:qr_code" alt="QR Code" class="qr-code">
+
+        <p style="text-align: center;">Aby odebrać paczkę, zeskanuj kod QR, przykładając go do czytnika.</p>
+
+        <p style="text-align: center; font-size: 14px; color: #666666;">Numer telefonu: <strong>{{ recipient_phone }}</strong></p>
+
+        <p style="text-align: center; font-size: 14px; color: #666666;">Kod odbioru: <strong>{{ pickup_code }}</strong></p>
+    </div>
+</body>
+</html>
