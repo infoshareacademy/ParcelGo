@@ -17,7 +17,9 @@ urlpatterns = [
     path('track/', views.track_package, name='track_package'),
     path('cancel_payment/<int:parcel_id>/', views.cancel_payment, name='cancel_payment'),
     path('link_package_status/<str:tracking_number>/', views.link_package_status, name='link_package_status'),
-
-
+    path('parcel_assignment/', views.parcel_assignment, name='parcel_assignment'),
+    path('parcel_assignment_success/', views.parcel_assignment_success, name='parcel_assignment_success'),
+    path('parcel_management/', views.parcel_management, name='parcel_management'),
+    path('parcel_management_success/', views.parcel_management_success, name='parcel_management_success'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

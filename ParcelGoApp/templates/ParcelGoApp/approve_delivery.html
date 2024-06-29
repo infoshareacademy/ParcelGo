@@ -22,7 +22,7 @@
         {% csrf_token %}
         {% for parcel in pending_parcels %}
             <input type="checkbox" name="approved_parcels" value="{{ parcel.id }}">
-            <label>{{ parcel }} - Parcel Locker: {{ parcel.destination_parcel_locker }}</label><br>
+            <label>Parcel ID: {{ parcel.id }} - Tracking number: {{ parcel.tracking_number }} - Parcel Locker: {{ parcel.destination_parcel_locker }}</label><br>
         {% endfor %}
         <button type="submit">Approve Selected Parcels</button>
     </form>

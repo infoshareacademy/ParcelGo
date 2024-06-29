@@ -49,10 +49,18 @@
                     {% if user.is_staff %}
                     <div class="box">
                         <h2>Employee Tools</h2> 
-                        </form>
+                        
                             <form action="{% url 'approve_delivery' %}" method="get">
                                 <button type="submit" class="btn btn-primary">Approve Delivery</button>
                             </form>
+                            <form action="{% url 'parcel_assignment' %}" method="get">
+                                <button type="submit" class="btn btn-primary">Parcel Assignment</button>
+                            </form>
+                            {% if user.is_superuser %}
+                            <form action="{% url 'parcel_management' %}" method="get">
+                                <button type="submit" class="btn btn-primary">Parcel Management</button>
+                            </form>
+                            {% endif %}    
                     </div>
                     {% endif %}
                 </div>    
