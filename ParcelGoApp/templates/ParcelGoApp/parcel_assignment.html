@@ -15,7 +15,7 @@
             <li>
                 <label>
                     <input type="checkbox" name="approved_parcels" value="{{ parcel.id }}">
-                    Parcel ID: {{ parcel.id }} - Tracking number: {{ parcel.tracking_number }} - Parcel Locker: {{ parcel.destination_parcel_locker }}
+                    Parcel ID: {{ parcel.id }} - Tracking number: {{ parcel.tracking_number }} - Parcel Locker: {{ parcel.destination_parcel_locker.city }} ({{ parcel.destination_parcel_locker.locker_number }})
                 </label>
             </li>
             {% endfor %}
@@ -23,20 +23,20 @@
 
         <label for="select_courier">Select Courier:</label>
         <select id="select_courier" name="select_courier">
-            <option value="{{ current_user.username }}">{{ current_user.username }}</option>
-
+            <option value="{{ current_user.id }}">{{ current_user.username }}</option>
         </select>
 
-        <button type="submit">Approve Selected Parcels</button>
+        <button type="submit">Assign Selected Parcels</button>
     </form>
+
     <div class="button-container">
         <button onclick="goBack()">Back</button>
+    </div>
 
     <script>
         function goBack() {
             window.location.href = '/users/account/';
         }
     </script>
-    </div>
 </body>
 </html>

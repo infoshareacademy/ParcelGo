@@ -221,7 +221,7 @@ def approve_delivery(request):
     else:
         pending_parcels = Parcel.objects.filter(
             is_approved=False,
-            courier_name=current_user.username
+            courier_name=current_user
         ).exclude(
             status__in=["Delivered", "Received", "Payment_Pending", "In delivery"]
         )
@@ -327,33 +327,51 @@ def link_package_status(request, tracking_number):
             request, "ParcelGoApp/link_package_status.html", {"message": message}
         )
 
+
 @staff_member_required
-def parcel_assignment(request):
+def manage_parcels(request, mode):
     current_user = request.user
     if request.method == "POST":
         approved_parcel_ids = request.POST.getlist("approved_parcels")
-        selected_courier = request.POST.get("select_courier")
 
-        for parcel_id in approved_parcel_ids:
-            parcel = Parcel.objects.get(id=parcel_id)
-            parcel.courier_name = selected_courier
-            parcel.save()
-
-        Parcel.objects.filter(id__in=approved_parcel_ids).update(
-            is_delivered=True, status='assigned_in_delivery'
-        )
-        return redirect("parcel_assignment_success")
+        if mode == "assignment":
+            Parcel.objects.filter(id__in=approved_parcel_ids).update(
+                courier_name=current_user, is_delivered=True, status='assigned_in_delivery'
+            )
+            return redirect("parcel_assignment_success")
+        elif mode == "management":
+            for parcel_id in approved_parcel_ids:
+                courier_username = request.POST.get(f"courier_name_{parcel_id}")
+                if courier_username:
+                    try:
+                        courier = User.objects.get(username=courier_username)
+                        Parcel.objects.filter(id=parcel_id).update(courier_name=courier)
+                    except User.DoesNotExist:
+                        messages.error(request, f"Courier with username {courier_username} does not exist.")
+                        continue
+                else:
+                    Parcel.objects.filter(id=parcel_id).update(courier_name=None)
+            return redirect("parcel_management_success")
 
     else:
-        pending_parcels = Parcel.objects.filter(is_approved=False).exclude(
-            status__in=["Delivered", "Received", "Payment_Pending", 'assigned_in_delivery']
-        )
-        courier_users = User.objects.filter(is_staff=True)
+        if mode == "assignment":
+            pending_parcels = Parcel.objects.filter(is_approved=False).exclude(
+                status__in=["Delivered", "Received", "Payment_Pending", 'assigned_in_delivery']
+            )
+        else:
+            pending_parcels = Parcel.objects.filter(is_approved=False).exclude(
+                status__in=["Delivered", "Received", "Payment_Pending"]
+            )
+
+        context = {"pending_parcels": pending_parcels, "current_user": current_user}
+        if mode == "management":
+            courier_users = User.objects.filter(is_staff=True)
+            context["courier_users"] = courier_users
 
         return render(
             request,
-            "ParcelGoApp/parcel_assignment.html",
-            {"pending_parcels": pending_parcels, "courier_users": courier_users, "current_user": current_user},
+            f"ParcelGoApp/{'parcel_assignment' if mode == 'assignment' else 'parcel_management'}.html",
+            context,
         )
 
 
@@ -363,29 +381,3 @@ def parcel_assignment_success(request):
 
 def parcel_management_success(request):
     return render(request, "ParcelGoApp/parcel_management_success.html")
-
-
-def parcel_management(request):
-    if request.method == "POST":
-        approved_parcel_ids = request.POST.getlist("approved_parcels")
-
-        for parcel_id in approved_parcel_ids:
-            parcel = Parcel.objects.get(id=parcel_id)
-
-            courier_name = request.POST.get(f"courier_name_{parcel_id}")
-            parcel.courier_name = courier_name
-            parcel.save()
-
-        return redirect("parcel_management_success")
-
-    else:
-        pending_parcels = Parcel.objects.filter(is_approved=False).exclude(
-            status__in=["Delivered", "Received", "Payment_Pending"]
-        )
-        courier_users = User.objects.filter(is_staff=True)
-
-        return render(
-            request,
-            "ParcelGoApp/parcel_management.html",
-            {"pending_parcels": pending_parcels, "courier_users": courier_users},
-        )

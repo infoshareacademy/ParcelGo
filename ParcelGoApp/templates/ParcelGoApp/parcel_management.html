@@ -8,36 +8,44 @@
     <h1>Parcel Management</h1>
 
     <form method="post" action="{% url 'parcel_management' %}">
-    {% csrf_token %}
-    <h2>Pending Parcels</h2>
-    <ul>
-        {% for parcel in pending_parcels %}
-        <li>
-            <label>
-                <input type="checkbox" name="approved_parcels" value="{{ parcel.id }}">
-                Parcel ID: {{ parcel.id }} - Tracking number: {{ parcel.tracking_number }} - Parcel Locker: {{ parcel.destination_parcel_locker }} - Courier assigned: {{ parcel.courier_name }}
-            </label>
-            <br>
-            <label for="courier_name_{{ parcel.id }}">Select Courier:</label>
-            <select id="courier_name_{{ parcel.id }}" name="courier_name_{{ parcel.id }}">
-                {% for user in courier_users %}
-                    <option value="{{ user.username }}">{{ user.username }}</option>
-                {% endfor %}
-            </select>
-        </li>
-        {% endfor %}
-    </ul>
+        {% csrf_token %}
+        <h2>Pending Parcels</h2>
+        <ul>
+            {% for parcel in pending_parcels %}
+            <li>
+                <label>
+                    <input type="checkbox" name="approved_parcels" value="{{ parcel.id }}">
+                    Parcel ID: {{ parcel.id }} -- Tracking number: {{ parcel.tracking_number }} -- Parcel status: {{ parcel.status }}
+                    -- Parcel Locker: {{ parcel.destination_parcel_locker.city }} ({{ parcel.destination_parcel_locker.locker_number }}) -- Courier assigned:
+                    {% if parcel.courier_name %}
+                        {{ parcel.courier_name.username }}
+                    {% else %}
+                        None
+                    {% endif %}
+                </label>
+                <br>
+                <label for="courier_name_{{ parcel.id }}">Select Courier:</label>
+                <select id="courier_name_{{ parcel.id }}" name="courier_name_{{ parcel.id }}">
+                    <option value="">Select a courier</option>
+                    {% for user in courier_users %}
+                        <option value="{{ user.username }}" {% if parcel.courier_name and parcel.courier_name.username == user.username %}selected{% endif %}>{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+            </li>
+            {% endfor %}
+        </ul>
 
-    <button type="submit">Approve Selected Parcels</button>
-</form>
+        <button type="submit">Assign Selected Parcels</button>
+    </form>
+
     <div class="button-container">
         <button onclick="goBack()">Back</button>
+    </div>
 
     <script>
         function goBack() {
             window.location.href = '/users/account/';
         }
     </script>
-    </div>
 </body>
 </html>
