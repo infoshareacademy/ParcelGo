@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-
+from .models import User
 from .models import ParcelLocker, Parcel
 from .forms import ParcelLockerSearchForm, ParcelForm
 from django.db.models import Q
@@ -162,6 +162,7 @@ def cancel_payment(request, parcel_id):
 
 @staff_member_required
 def approve_delivery(request):
+    current_user = request.user
     if request.method == "POST":
         approved_parcel_ids = request.POST.getlist("approved_parcels")
 
@@ -218,8 +219,11 @@ def approve_delivery(request):
         return redirect("delivery_approval_success")
 
     else:
-        pending_parcels = Parcel.objects.filter(is_approved=False).exclude(
-            status__in=["Delivered", "Received", "Payment_Pending"]
+        pending_parcels = Parcel.objects.filter(
+            is_approved=False,
+            courier_name=current_user
+        ).exclude(
+            status__in=["Delivered", "Received", "Payment_Pending", "In delivery"]
         )
         return render(
             request,
@@ -322,3 +326,58 @@ def link_package_status(request, tracking_number):
         return render(
             request, "ParcelGoApp/link_package_status.html", {"message": message}
         )
+
+
+@staff_member_required
+def manage_parcels(request, mode):
+    current_user = request.user
+    if request.method == "POST":
+        approved_parcel_ids = request.POST.getlist("approved_parcels")
+
+        if mode == "assignment":
+            Parcel.objects.filter(id__in=approved_parcel_ids).update(
+                courier_name=current_user, is_delivered=True, status='assigned_in_delivery'
+            )
+            return redirect("parcel_assignment_success")
+        elif mode == "management":
+            for parcel_id in approved_parcel_ids:
+                courier_username = request.POST.get(f"courier_name_{parcel_id}")
+                if courier_username:
+                    try:
+                        courier = User.objects.get(username=courier_username)
+                        Parcel.objects.filter(id=parcel_id).update(courier_name=courier)
+                    except User.DoesNotExist:
+                        messages.error(request, f"Courier with username {courier_username} does not exist.")
+                        continue
+                else:
+                    Parcel.objects.filter(id=parcel_id).update(courier_name=None)
+            return redirect("parcel_management_success")
+
+    else:
+        if mode == "assignment":
+            pending_parcels = Parcel.objects.filter(is_approved=False).exclude(
+                status__in=["Delivered", "Received", "Payment_Pending", 'assigned_in_delivery']
+            )
+        else:
+            pending_parcels = Parcel.objects.filter(is_approved=False).exclude(
+                status__in=["Delivered", "Received", "Payment_Pending"]
+            )
+
+        context = {"pending_parcels": pending_parcels, "current_user": current_user}
+        if mode == "management":
+            courier_users = User.objects.filter(is_staff=True)
+            context["courier_users"] = courier_users
+
+        return render(
+            request,
+            f"ParcelGoApp/{'parcel_assignment' if mode == 'assignment' else 'parcel_management'}.html",
+            context,
+        )
+
+
+def parcel_assignment_success(request):
+    return render(request, "ParcelGoApp/parcel_assignment_success.html")
+
+
+def parcel_management_success(request):
+    return render(request, "ParcelGoApp/parcel_management_success.html")

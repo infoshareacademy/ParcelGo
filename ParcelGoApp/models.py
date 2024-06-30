@@ -23,7 +23,8 @@ class Parcel(models.Model):
         ('In delivery', 'In delivery'),
         ('Delivered', 'Delivered'),
         ('Received', 'Received'),
-        ('Payment_Pending', 'Payment_Pending')
+        ('Payment_Pending', 'Payment_Pending'),
+        ('assigned_in_delivery', 'assigned_in_delivery')
     ]
 
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -45,6 +46,7 @@ class Parcel(models.Model):
     pickup_code = models.CharField(max_length=100, default="", blank=True)
     received_date = models.DateTimeField(null=True, blank=True)
     recipient_email = models.EmailField(max_length=254, default="")
+    courier_name = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_parcels')
 
     def __str__(self):
         return f"{self.tracking_number} - {self.pickup_code}"
